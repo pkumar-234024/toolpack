@@ -1,6 +1,5 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import { Camera, PenTool, Scaling, FileType2, ArrowRight, Shield, Zap, Sparkles, Layout } from 'lucide-react';
+import { Camera, PenTool, Scaling, FileType2, ArrowRight, Shield, Zap, Sparkles } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Link } from 'react-router-dom';
@@ -17,7 +16,7 @@ const features = [
     title: 'Signature Editor',
     description: 'Draw or upload your signature. Export with transparent background for digital documents.',
     icon: PenTool,
-    color: 'bg- brand-accent',
+    color: 'bg-brand-accent',
     link: '/tools/signature',
   },
   {

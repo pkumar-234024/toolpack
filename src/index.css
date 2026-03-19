@@ -2,28 +2,75 @@
 
 @theme {
   --color-brand-primary: #6366f1; /* Indigo 500 */
-  --color-brand-secondary: #ec4899; /* Pink 500 */
-  --color-brand-accent: #8b5cf6; /* Violet 500 */
+  --color-brand-secondary: #0f172a; /* Slate 900 */
+  --color-brand-accent: #10b981; /* Emerald 500 */
+  --color-brand-danger: #ef4444; /* Red 500 */
+  
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
-}
-
-@utility glass {
-  @apply bg-white/70 backdrop-blur-md border border-white/20;
-}
-
-@utility glass-dark {
-  @apply bg-slate-900/70 backdrop-blur-md border border-slate-700/50;
+  --radius-3xl: 2rem;
+  --radius-4xl: 3rem;
+  
+  --shadow-3xl: 0 35px 60px -15px rgba(0, 0, 0, 0.3);
+  --shadow-4xl: 0 50px 100px -20px rgba(0, 0, 0, 0.4);
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
   body {
-    @apply bg-slate-50 text-slate-900 transition-colors duration-300;
+    @apply bg-slate-50 text-slate-900 transition-colors duration-500 font-sans antialiased selection:bg-brand-primary/20 selection:text-brand-primary overflow-x-hidden;
   }
   
   .dark body {
-    @apply bg-[#0f172a] text-slate-50;
+    @apply bg-[#020617] text-slate-100 selection:bg-brand-primary/30 selection:text-brand-primary;
   }
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-sm relative overflow-hidden;
+  }
+  
+  .dark .glass {
+    @apply bg-slate-900/40 backdrop-blur-xl border border-slate-700/30 shadow-2xl;
+  }
+}
+
+@layer utilities {
+  .animate-reveal {
+    animation: reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .bg-studio-grid {
+    background-image: radial-gradient(rgba(0,0,0,0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  
+  .dark .bg-studio-grid {
+    background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+  }
+}
+
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
 }
 
 /* Custom Scrollbar */
@@ -31,27 +78,8 @@
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  @apply bg-slate-100;
-}
-.dark ::-webkit-scrollbar-track {
-  @apply bg-slate-800;
+  @apply bg-transparent;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 rounded-full;
-}
-.dark ::-webkit-scrollbar-thumb {
-  @apply bg-slate-600 rounded-full;
-}
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-slate-400;
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
-  100% { transform: translateY(0px); }
+  @apply bg-slate-200 dark:bg-slate-800 rounded-full border-2 border-solid border-transparent bg-clip-padding hover:bg-slate-300 dark:hover:bg-slate-700;
 }
