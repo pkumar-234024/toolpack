@@ -12,9 +12,10 @@ import {
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { 
-  ZoomIn, Sun, Grid, Sparkles, 
+  Sun, Grid, Sparkles, 
   RotateCw, Eye, EyeOff, Check, Settings, Layout as LayoutIcon,
-  Maximize, Upload, ShieldCheck, Zap, Info, Save, Printer, Trash2, RotateCcw, Download
+  Maximize, Upload, ShieldCheck, Zap, Save, Printer, Trash2, RotateCcw, Download,
+  Minus, Plus
 } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import toast from 'react-hot-toast';
@@ -83,7 +84,7 @@ export const PassportTool = () => {
   const dispatch = useDispatch();
   const { 
     image, crop, zoom, rotation, brightness, contrast, 
-    paperSize, spacing, photoRatio, copies, bgColor, showFaceGuide, dpi 
+    paperSize, spacing, photoRatio, copies, bgColor, showFaceGuide, dpi, selectedPreset
   } = useSelector((state: RootState) => state.passport);
   
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
@@ -264,10 +265,10 @@ export const PassportTool = () => {
   };
 
   return (
-    <div className="container mx-auto px-6 py-8 pt-10 max-w-7xl relative min-h-screen">
+    <div className="container mx-auto px-6 py-12 pt-16 max-w-[1400px] relative min-h-screen">
       <style>{`
+        @page { margin: 0; size: auto; }
         @media print { 
-          @page { margin: 0; size: auto; } 
           body { margin: 0; padding: 0; overflow: visible !important; } 
           nav, footer, .no-print, header, aside { display: none !important; } 
           .print-sheet { 
@@ -285,8 +286,46 @@ export const PassportTool = () => {
         } 
         .print-sheet { display: none; }
         
-        .face-guide-overlay {
-          background: radial-gradient(ellipse 55% 75% at 50% 45%, transparent 100%, rgba(0,0,0,0.1) 100%);
+        .saas-card {
+          background: rgba(23, 23, 26, 0.4);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.2);
+        }
+
+        .saas-input {
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
+        }
+
+        .saas-input:focus {
+          border-color: rgba(99, 102, 241, 0.5);
+          background: rgba(255, 255, 255, 0.05);
+          box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        input[type="range"] {
+          -webkit-appearance: none;
+          background: transparent;
+        }
+
+        input[type="range"]::-webkit-slider-runnable-track {
+          width: 100%;
+          height: 4px;
+          background: rgba(255, 255, 255, 0.08);
+          border-radius: 2px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          height: 12px;
+          width: 12px;
+          border-radius: 50%;
+          background: #6366f1;
+          margin-top: -4px;
+          cursor: pointer;
+          box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
         }
       `}</style>
       
@@ -308,314 +347,200 @@ export const PassportTool = () => {
         </div>
       )}
 
-      {/* Header */}
-      <div className="no-print mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
-            Passport Studio <span className="bg-brand-primary text-white text-[10px] px-2 py-0.5 rounded-full uppercase tracking-tighter">Gold Edition</span>
-          </h1>
-          <p className="text-slate-500 text-xs font-medium max-w-md mt-1">
-            Studio-grade passport & visa photo generation. Compliant with international standards.
-          </p>
+      {/* Compact SaaS Header */}
+      <div className="no-print mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 bg-indigo-500 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/20">
+             <LayoutIcon className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h1 className="text-xl font-semibold tracking-tight text-white flex items-center gap-2">
+              Passport Studio <span className="text-[10px] font-medium text-slate-500 bg-slate-800/50 px-2 py-0.5 rounded uppercase tracking-wider">v2.4.0</span>
+            </h1>
+            <p className="text-[11px] text-slate-500 font-medium">Professional grade identity photo generation</p>
+          </div>
         </div>
         <div className="flex items-center gap-3">
-          <div className="hidden md:flex flex-col items-end mr-4">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">System Status</span>
-            <span className="text-[10px] font-bold text-green-500 flex items-center gap-1"><Zap className="w-2 h-2 fill-current" /> ALL SYSTEMS NORMAL</span>
+          <div className="flex flex-col items-end pr-3 border-r border-slate-800">
+            <span className="text-[10px] font-semibold text-slate-600 uppercase tracking-widest leading-none mb-1">Status</span>
+            <span className="text-[10px] font-semibold text-green-500 flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-green-500"></div> OPERATIONAL</span>
           </div>
-          <Button variant="ghost" className="hover:bg-slate-100 dark:hover:bg-slate-800">
-            <Settings className="w-5 h-5" />
+          <Button variant="outline" className="h-9 w-9 p-0 rounded-lg border-slate-800/50">
+            <Settings className="w-4 h-4 text-slate-400" />
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 no-print pb-20">
-        {/* Left Column: Input & Editor */}
-        <div className="lg:col-span-12 xl:col-span-8 space-y-8">
-          
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 no-print pb-20">
+        
+        {/* Left Column: Editor & Specifications */}
+        <div className="xl:col-span-8 space-y-8">
           <AnimatePresence mode="wait">
             {!image ? (
               <motion.div
-                key="dropzone"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="w-full"
+                key="uploader"
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                className="w-full max-w-xl mx-auto"
               >
                 <div 
                   {...getRootProps()} 
-                  className={`relative group cursor-pointer transition-all duration-300 rounded-3xl overflow-hidden border-2 border-dashed 
-                    ${isDragActive ? 'border-brand-primary bg-brand-primary/5' : 'border-slate-200 hover:border-brand-primary/50 bg-white dark:bg-slate-900'}
+                  className={`relative group cursor-pointer transition-all duration-300 rounded-3xl overflow-hidden border-2 border-dashed h-[260px] flex flex-col items-center justify-center
+                    ${isDragActive ? 'border-indigo-500 bg-indigo-500/5 shadow-2xl shadow-indigo-500/10' : 'border-slate-800 bg-slate-900/40 hover:border-slate-700'}
                   `}
-                  onMouseEnter={() => setIsHoveringDropzone(true)}
-                  onMouseLeave={() => setIsHoveringDropzone(false)}
                 >
                   <input {...getInputProps()} />
-                  <div className="aspect-[21/9] flex flex-col items-center justify-center p-12 text-center">
-                    <div className="relative mb-6">
-                      <div className="w-20 h-20 bg-brand-primary/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                        <Upload className="w-8 h-8 text-brand-primary" />
-                      </div>
-                      <motion.div 
-                        animate={isHoveringDropzone ? { scale: [1, 1.2, 1] } : {}}
-                        transition={{ duration: 2, repeat: Infinity }}
-                        className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 border-4 border-white dark:border-slate-900 rounded-full flex items-center justify-center"
-                      >
-                        <Check className="w-3 h-3 text-white" strokeWidth={4} />
-                      </motion.div>
+                  <div className="flex flex-col items-center text-center p-6">
+                    <div className="w-12 h-12 bg-indigo-500/10 rounded-xl flex items-center justify-center mb-4 border border-indigo-500/20 group-hover:scale-110 transition-transform duration-500">
+                      <Upload className="w-6 h-6 text-indigo-400" />
                     </div>
-                    
-                    <h2 className="text-2xl font-black mb-2 text-slate-800 dark:text-white">Upload Your Photograph</h2>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm max-w-xs mx-auto mb-8 font-medium">
-                      Drag and drop here, or click to browse. Supports JPG, PNG, WEBP.
+                    <h2 className="text-2xl font-semibold mb-3 text-white tracking-tight">Upload Session</h2>
+                    <p className="text-slate-500 text-sm max-w-[280px] mb-8 leading-relaxed">
+                      Drag and drop high-resolution source portraits or click to browse files
                     </p>
-                    
-                    <div className="flex flex-wrap items-center justify-center gap-3">
-                      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-[10px] font-bold text-slate-500 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                        <ShieldCheck className="w-3.5 h-3.5" /> SECURE PROCESSING
-                      </div>
-                      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-[10px] font-bold text-slate-500 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                        <Maximize className="w-3.5 h-3.5" /> HD QUALITY
-                      </div>
+                    <div className="flex items-center gap-4 text-[10px] uppercase tracking-widest font-semibold text-slate-600">
+                      <span className="flex items-center gap-1.5"><ShieldCheck className="w-3 h-3" /> Encrypted</span>
+                      <div className="w-1 h-1 rounded-full bg-slate-800"></div>
+                      <span className="flex items-center gap-1.5"><Maximize className="w-3 h-3" /> RAW Support</span>
                     </div>
                   </div>
-                </div>
-                
-                <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {[
-                    { title: 'Good Lighting', desc: 'Face should be clearly visible', icon: <Sun className="w-4 h-4" /> },
-                    { title: 'Front View', desc: 'Look directly at the camera', icon: <Eye className="w-4 h-4" /> },
-                    { title: 'Plain Background', desc: 'Simple backgrounds work best', icon: <Grid className="w-4 h-4" /> }
-                  ].map((tip, i) => (
-                    <Card key={i} className="p-4 flex items-start gap-3 bg-transparent border-slate-100 dark:border-slate-800">
-                      <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400">
-                        {tip.icon}
-                      </div>
-                      <div>
-                        <h4 className="text-xs font-black text-slate-800 dark:text-white">{tip.title}</h4>
-                        <p className="text-[10px] text-slate-500 font-medium">{tip.desc}</p>
-                      </div>
-                    </Card>
-                  ))}
                 </div>
               </motion.div>
             ) : (
               <motion.div
-                key="editor"
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="space-y-6"
+                key="editor-suite"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-8"
               >
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="px-3 py-1 bg-brand-primary text-white text-[10px] font-black rounded-md flex items-center gap-2">
-                       <Sparkles className="w-3 h-3" /> STEP 1: STUDIO ADJUSTMENT
-                    </div>
-                    <Button variant="ghost" size="sm" onClick={clearImage} className="text-xs text-red-500 font-bold hover:bg-red-50">
-                      <Trash2 className="w-3 h-3 mr-1" /> START OVER
-                    </Button>
-                  </div>
+                {/* Editor Header */}
+                <div className="flex items-center justify-between saas-card px-4 py-2 rounded-xl border border-white/5">
                   <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded bg-indigo-500/10 flex items-center justify-center text-indigo-400 border border-indigo-500/20">
+                      <Sparkles className="w-3 h-3" />
+                    </div>
+                    <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Workspace</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
                     <Button 
                       variant={showFaceGuide ? 'primary' : 'outline'} 
                       size="sm" 
                       onClick={() => dispatch(toggleFaceGuide())}
-                      className="text-[10px] font-black h-8"
+                      className="h-7 text-[10px] px-3 font-medium border-slate-800"
                     >
-                      {showFaceGuide ? <Eye className="w-3.5 h-3.5 mr-1" /> : <EyeOff className="w-3.5 h-3.5 mr-1" />}
-                      {showFaceGuide ? 'HIDE GUIDE' : 'SHOW GUIDE'}
+                      {showFaceGuide ? <Eye className="w-3 h-3 mr-2 text-indigo-400" /> : <EyeOff className="w-3 h-3 mr-2" />}
+                      Guide
+                    </Button>
+                    <div className="w-px h-3 bg-slate-800 mx-1"></div>
+                    <Button variant="ghost" size="sm" onClick={clearImage} className="h-7 text-[10px] text-slate-500 hover:text-rose-400 font-medium">
+                      Reset
                     </Button>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                  <div className="lg:col-span-7 xl:col-span-8">
-                    <Card className="aspect-[4/3] w-full flex items-center justify-center p-0 overflow-hidden relative group bg-slate-100 dark:bg-slate-800/50 shadow-2xl border-none">
-                      <div className="absolute inset-0 z-0">
-                         {/* Studio Light Effect */}
-                         <div className="absolute top-0 left-1/4 w-1/2 h-full bg-white/5 skew-x-12 pointer-events-none blur-3xl opacity-20"></div>
+                {/* Main Cropper - Ultra Compact */}
+                <Card className="aspect-square max-w-[480px] w-full p-0 overflow-hidden relative group bg-black rounded-3xl border border-white/5 saas-card mx-auto">
+                  <div className="w-full h-full relative" style={{ backgroundColor: bgColor }}>
+                    <Cropper 
+                      image={image} 
+                      crop={crop} 
+                      zoom={zoom} 
+                      rotation={rotation} 
+                      aspect={photoRatio.width / photoRatio.height} 
+                      onCropChange={(c) => dispatch(setCrop(c))} 
+                      onZoomChange={(z) => dispatch(setZoom(z))} 
+                      onRotationChange={(r) => dispatch(setRotation(r))} 
+                      onCropComplete={onCropComplete} 
+                      style={{ 
+                        containerStyle: { background: 'transparent' },
+                        mediaStyle: { filter: `brightness(${brightness}%) contrast(${contrast}%)` },
+                        cropAreaStyle: { border: '1px solid rgba(255, 255, 255, 0.4)', boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.7)' }
+                      }} 
+                    />
+                    {showFaceGuide && (
+                      <div className="absolute inset-0 pointer-events-none z-10">
+                        <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                          <ellipse cx="50" cy="45" rx="18" ry="25" fill="none" stroke="white" strokeWidth="0.05" strokeDasharray="1,1" className="opacity-30" />
+                          <line x1="50" y1="0" x2="50" y2="100" stroke="white" strokeWidth="0.05" className="opacity-20" />
+                          <line x1="0" y1="42" x2="100" y2="42" stroke="white" strokeWidth="0.05" className="opacity-20" />
+                        </svg>
                       </div>
-                      
-                      <div className="w-full h-full relative" style={{ backgroundColor: bgColor }}>
-                        <Cropper 
-                          image={image} 
-                          crop={crop} 
-                          zoom={zoom} 
-                          rotation={rotation} 
-                          aspect={photoRatio.width / photoRatio.height} 
-                          onCropChange={(c) => dispatch(setCrop(c))} 
-                          onZoomChange={(z) => dispatch(setZoom(z))} 
-                          onRotationChange={(r) => dispatch(setRotation(r))} 
-                          onCropComplete={onCropComplete} 
-                          style={{ 
-                            containerStyle: { background: 'transparent' },
-                            cropAreaStyle: { border: '2px solid var(--color-brand-primary)', boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.7)' }
-                          }} 
-                        />
-                        
-                        {showFaceGuide && (
-                          <div className="absolute inset-0 pointer-events-none z-10">
-                            <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                              {/* Head Outline */}
-                              <ellipse cx="50" cy="45" rx="18" ry="25" fill="none" stroke="var(--color-brand-primary)" strokeWidth="0.5" strokeDasharray="2,2" className="opacity-60" />
-                              {/* Eye Line */}
-                              <line x1="20" y1="42" x2="80" y2="42" stroke="var(--color-brand-primary)" strokeWidth="0.2" strokeDasharray="3,1" className="opacity-40" />
-                              {/* Vertical Center */}
-                              <line x1="50" y1="10" x2="50" y2="90" stroke="var(--color-brand-primary)" strokeWidth="0.2" strokeDasharray="3,1" className="opacity-40" />
-                              {/* Chin Line */}
-                              <line x1="32" y1="70" x2="68" y2="70" stroke="var(--color-brand-primary)" strokeWidth="0.5" className="opacity-60" />
-                            </svg>
-                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 bg-black/50 text-white text-[8px] font-bold rounded-full backdrop-blur-md">
-                              ALIGN FACE WITH OVERLAY
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                      
-                      {/* Floating Control Bar for Quick Edits */}
-                      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 p-1.5 bg-black/40 backdrop-blur-xl rounded-2xl border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                         <button onClick={() => dispatch(setRotation(rotation - 90))} className="p-2 text-white hover:bg-white/20 rounded-xl transition-colors"><RotateCcw className="w-4 h-4" /></button>
-                         <div className="w-[1px] h-4 bg-white/10 mx-1"></div>
-                         <button onClick={() => dispatch(setZoom(zoom - 0.1))} className="p-2 text-white hover:bg-white/20 rounded-xl transition-colors"><Trash2 className="w-4 h-4 rotate-45" /></button> {/* Placeholder for ZoomOut icon if needed */}
-                         <button onClick={() => dispatch(setZoom(zoom + 0.1))} className="p-2 text-white hover:bg-white/20 rounded-xl transition-colors"><ZoomIn className="w-4 h-4" /></button>
-                         <div className="w-[1px] h-4 bg-white/10 mx-1"></div>
-                         <button onClick={() => dispatch(setRotation(rotation + 90))} className="p-2 text-white hover:bg-white/20 rounded-xl transition-colors"><RotateCw className="w-4 h-4" /></button>
-                      </div>
-                    </Card>
+                    )}
+                  </div>
+                  <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 p-1 bg-black/60 backdrop-blur-xl rounded-xl border border-white/10 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                    <button onClick={() => dispatch(setRotation(rotation - 90))} className="p-2.5 text-slate-400 hover:text-white transition-colors"><RotateCcw className="w-4 h-4" /></button>
+                    <div className="w-px h-4 bg-white/10 mx-1"></div>
+                    <button onClick={() => dispatch(setZoom(Math.max(1, zoom - 0.1)))} className="p-2.5 text-slate-400 hover:text-white transition-colors"><Minus className="w-4 h-4" /></button>
+                    <div className="text-[11px] font-semibold text-white w-10 text-center">{zoom.toFixed(1)}x</div>
+                    <button onClick={() => dispatch(setZoom(Math.min(4, zoom + 0.1)))} className="p-2.5 text-slate-400 hover:text-white transition-colors"><Plus className="w-4 h-4" /></button>
+                    <div className="w-px h-4 bg-white/10 mx-1"></div>
+                    <button onClick={() => dispatch(setRotation(rotation + 90))} className="p-2.5 text-slate-400 hover:text-white transition-colors"><RotateCw className="w-4 h-4" /></button>
+                  </div>
+                </Card>
+
+                {/* Left Side Specifications */}
+                <div className="space-y-6">
+                  <div className="grid grid-cols-2 md:grid-cols-2 gap-3">
+                    {countries.map(c => (
+                      <button 
+                        key={c.name} 
+                        onClick={() => dispatch(setPhotoRatio({ width: c.width, height: c.height, presetName: c.name }))} 
+                        className={`px-4 py-4 rounded-2xl border text-left transition-all relative overflow-hidden group
+                        ${selectedPreset === c.name 
+                          ? 'bg-indigo-500/10 border-indigo-500/40 shadow-xl shadow-indigo-500/5' 
+                          : 'bg-slate-900/40 border-slate-800 hover:border-slate-700'}`}
+                      >
+                        <div className={`text-[12px] font-semibold mb-1 tracking-tight ${selectedPreset === c.name ? 'text-indigo-400' : 'text-slate-200'}`}>{c.name}</div>
+                        <div className="text-[10px] text-slate-500 font-medium">{c.label}</div>
+                        {selectedPreset === c.name && <div className="absolute top-2 right-2 w-1 h-1 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,1)]"></div>}
+                      </button>
+                    ))}
                   </div>
 
-                  {/* Settings Sidebar for the Editor */}
-                  <div className="lg:col-span-5 xl:col-span-4 space-y-4">
-                    <Card className="p-5 space-y-6 bg-white dark:bg-slate-900 border-none shadow-xl">
-                      <div>
-                        <h3 className="text-xs font-black uppercase text-slate-400 mb-4 flex items-center gap-2">
-                          <Settings className="w-3.5 h-3.5" /> Dimensions Setting
-                        </h3>
-                        <div className="grid grid-cols-2 gap-2 mb-4">
-                          {countries.map(c => (
-                            <button 
-                              key={c.name} 
-                              onClick={() => dispatch(setPhotoRatio({ width: c.width, height: c.height }))} 
-                              className={`py-3 px-2 rounded-xl border text-[10px] font-bold text-center transition-all 
-                              ${photoRatio.width === c.width ? 'bg-slate-900 border-slate-900 text-white dark:bg-brand-primary dark:border-brand-primary' : 'border-slate-100 hover:border-slate-300 text-slate-500'}`}
-                            >
-                              {c.name}
-                            </button>
-                          ))}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     <div className="saas-card p-5 rounded-2xl flex items-center justify-between group">
+                        <div className="flex flex-col">
+                          <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-1.5 leading-none">Custom Area</span>
+                          <span className="text-[10px] text-slate-600 font-medium italic">Aspect Matrix</span>
                         </div>
-                        
-                        <div className="grid grid-cols-2 gap-3 pt-2">
-                           <div className="space-y-1.5">
-                              <label className="text-[10px] font-black uppercase text-slate-400">Width (mm)</label>
-                              <input 
+                        <div className="flex items-center gap-3">
+                           <div className="flex flex-col items-center">
+                               <input 
                                 type="number" 
                                 value={Math.round(photoRatio.width * 10)} 
-                                onChange={(e) => dispatch(setPhotoRatio({ ...photoRatio, width: Number(e.target.value) / 10 }))}
-                                className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-xs font-black" 
+                                onChange={(e) => dispatch(setPhotoRatio({ width: Number(e.target.value) / 10, height: photoRatio.height }))}
+                                className="w-14 h-9 saas-input rounded-lg text-center text-sm font-semibold text-white focus:outline-none" 
                               />
+                              <span className="text-[9px] text-slate-600 mt-1 uppercase font-bold">W</span>
                            </div>
-                           <div className="space-y-1.5">
-                              <label className="text-[10px] font-black uppercase text-slate-400">Height (mm)</label>
+                           <span className="text-slate-800 font-bold mb-4">×</span>
+                           <div className="flex flex-col items-center">
                               <input 
                                 type="number" 
                                 value={Math.round(photoRatio.height * 10)} 
-                                onChange={(e) => dispatch(setPhotoRatio({ ...photoRatio, height: Number(e.target.value) / 10 }))}
-                                className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-xs font-black" 
+                                onChange={(e) => dispatch(setPhotoRatio({ width: photoRatio.width, height: Number(e.target.value) / 10 }))}
+                                className="w-14 h-9 saas-input rounded-lg text-center text-sm font-semibold text-white focus:outline-none" 
                               />
+
+                              <span className="text-[9px] text-slate-600 mt-1 uppercase font-bold">H</span>
                            </div>
                         </div>
-                      </div>
-
-                      <div className="pt-4 border-t border-slate-50 dark:border-slate-800">
-                        <h3 className="text-xs font-black uppercase text-slate-400 mb-4 flex items-center gap-2">
-                          <Sparkles className="w-3.5 h-3.5" /> Background & Retouch
-                        </h3>
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          {presets.map(p => (
-                            <button 
-                              key={p.color} 
-                              onClick={() => dispatch(setBgColor(p.color))} 
-                              className={`w-10 h-10 rounded-xl border-4 transition-all hover:scale-105 ${bgColor === p.color ? 'border-brand-primary shadow-lg' : 'border-slate-100'}`} 
-                              style={{ backgroundColor: p.color }}
-                            >
-                              {bgColor === p.color && <Check className={`w-4 h-4 mx-auto ${p.color === '#ffffff' ? 'text-black' : 'text-white'}`} />}
-                            </button>
-                          ))}
-                          <div className="relative group">
-                            <input 
-                              type="color" 
-                              value={bgColor} 
-                              onChange={(e) => dispatch(setBgColor(e.target.value))} 
-                              className="w-10 h-10 rounded-xl border-4 border-slate-100 overflow-hidden cursor-pointer" 
-                            />
-                             <div className="absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                               <Check className="w-3 h-3 text-slate-400" />
-                             </div>
-                          </div>
+                     </div>
+                     <div className="saas-card p-5 rounded-2xl flex items-center justify-between">
+                        <div className="flex flex-col">
+                          <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-1.5 leading-none">Print DPI</span>
+                          <span className="text-[10px] text-slate-600 font-medium italic">High Density</span>
                         </div>
-                        
-                        <Button 
-                          variant="outline" 
-                          className="w-full h-11 text-xs font-black border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800" 
-                          onClick={handleRemoveBG} 
-                          isLoading={isRemovingBG}
-                          leftIcon={<Sparkles className="w-4 h-4 text-brand-primary" />}
-                        >
-                          AI BACKGROUND REMOVAL
-                        </Button>
-
-                        <div className="grid grid-cols-1 gap-4 pt-4">
-                          <div className="space-y-2">
-                            <div className="flex justify-between items-center text-[10px] font-black uppercase text-slate-400">
-                              <span>Brightness</span>
-                              <span className="text-brand-primary">{brightness}%</span>
-                            </div>
-                            <input 
-                              type="range" min="50" max="150" value={brightness} 
-                              onChange={(e) => dispatch(setAdjustment({ type: 'brightness', value: Number(e.target.value) }))} 
-                              className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg accent-brand-primary" 
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <div className="flex justify-between items-center text-[10px] font-black uppercase text-slate-400">
-                              <span>Contrast</span>
-                              <span className="text-brand-primary">{contrast}%</span>
-                            </div>
-                            <input 
-                              type="range" min="50" max="150" value={contrast} 
-                              onChange={(e) => dispatch(setAdjustment({ type: 'contrast', value: Number(e.target.value) }))} 
-                              className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg accent-brand-primary" 
-                            />
-                          </div>
+                        <div className="flex items-center gap-4 flex-1 max-w-[160px] ml-6">
+                           <input 
+                             type="range" min="150" max="600" step="50" value={dpi} 
+                             onChange={(e) => dispatch(setDPI(Number(e.target.value)))} 
+                             className="flex-1" 
+                           />
+                           <span className="text-sm font-bold text-indigo-400 w-8 text-right underline decoration-indigo-500/20 underline-offset-4">{dpi}</span>
                         </div>
-                      </div>
-
-                      <div className="pt-4 space-y-4">
-                         <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-black text-slate-400 uppercase">Input DPI</span>
-                            <span className="text-[10px] font-black text-brand-primary">{dpi} DPI</span>
-                         </div>
-                         <input 
-                           type="range" 
-                           min="150" 
-                           max="600" 
-                           step="50" 
-                           value={dpi} 
-                           onChange={(e) => dispatch(setDPI(Number(e.target.value)))} 
-                           className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg accent-brand-primary" 
-                         />
-                         <div className="flex items-center justify-between text-[10px] font-bold text-slate-500 italic">
-                            <span>Standard</span>
-                            <span>Ultra HD</span>
-                         </div>
-                      </div>
-
-                      <div className="pt-2">
-                        <Button onClick={handleApplyCrop} className="w-full h-12 text-sm font-black shadow-lg shadow-brand-primary/20" leftIcon={<Save className="w-5 h-5" />}>
-                           GENERATE STUDIO PHOTO
-                        </Button>
-                      </div>
-                    </Card>
+                     </div>
                   </div>
                 </div>
               </motion.div>
@@ -623,8 +548,8 @@ export const PassportTool = () => {
           </AnimatePresence>
         </div>
 
-        {/* Right Column (Sidebar for Preview and Layout) */}
-        <div className="lg:col-span-12 xl:col-span-4 space-y-6">
+        {/* Right Column: Adjustments & Preview */}
+        <div className="xl:col-span-4">
           <AnimatePresence>
             {image && (
               <motion.div
@@ -632,157 +557,151 @@ export const PassportTool = () => {
                 animate={{ opacity: 1, x: 0 }}
                 className="space-y-6"
               >
-                {/* STEP 2: PREVIEW & LAYOUT */}
-                <div className="space-y-4">
-                   <div className="flex items-center justify-between">
-                     <h2 className="text-xs font-black uppercase text-slate-400 flex items-center gap-2">
-                       <LayoutIcon className="w-3.5 h-3.5" /> STEP 2: SHEET LAYOUT
-                     </h2>
-                     <div className="text-[10px] font-bold text-slate-400 px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded uppercase">Live Preview</div>
-                   </div>
-                   
-                   <Card className="p-6 bg-slate-900 border-none shadow-2xl relative overflow-hidden group">
-                      <div className="absolute inset-0 z-0 bg-gradient-to-br from-slate-800 to-black opacity-50"></div>
-                      
-                      {/* Interactive Preview Container */}
-                      <div className="relative z-10 flex items-center justify-center min-h-[300px]">
-                        <div 
-                          className="bg-white shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-transform duration-500 group-hover:scale-[1.02]" 
-                          style={{ 
-                            width: pagePx.w, 
-                            height: pagePx.h,
-                            padding: '0'
-                          }}
-                        >
-                          <div style={{ 
-                            display: 'flex', 
-                            flexWrap: 'wrap', 
-                            gap: `${spacing * previewScale}mm`, 
-                            padding: '0' 
-                          }}>
-                            {Array.from({ length: copies }).map((_, i) => (
-                              <div key={i} style={{ 
-                                width: `${photoRatio.width * 10 * previewScale}mm`, 
-                                height: `${photoRatio.height * 10 * previewScale}mm`, 
-                                backgroundColor: bgColor,
-                                position: 'relative'
-                              }}>
-                                {finalPhoto ? (
-                                  <img src={finalPhoto} alt="Preview" className="w-full h-full object-cover" />
-                                ) : (
-                                  <div className="w-full h-full border border-slate-100 flex items-center justify-center">
-                                    <div className="text-[6px] font-black text-slate-200">#{i+1}</div>
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
+                {/* Adjustments Panel */}
+                <Card className="p-6 saas-card space-y-7 border-none rounded-3xl overflow-hidden shadow-2xl">
+                   <div>
+                      <div className="flex items-center justify-between mb-5">
+                        <div className="flex items-center gap-2.5">
+                           <div className="w-7 h-7 bg-indigo-500/10 rounded-lg flex items-center justify-center text-indigo-400 border border-indigo-500/20">
+                             <Sun className="w-3.5 h-3.5" />
+                           </div>
+                           <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-300">Adjustment Suite</h3>
                         </div>
-                        
-                        {!finalPhoto && (
-                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <div className="bg-brand-primary/90 text-white text-[10px] font-black px-4 py-2 rounded-full backdrop-blur-md flex items-center gap-2 animate-bounce">
-                               <Info className="w-3 h-3" /> APPLY EDITS TO PREVIEW
+                      </div>
+
+                      <div className="space-y-6">
+                        <div className="space-y-4 pt-1">
+                            <div className="flex justify-between items-center px-0.5">
+                              <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Exposure</span>
+                              <span className="text-[11px] font-bold text-indigo-400/80">{brightness}%</span>
                             </div>
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="absolute bottom-4 right-4 z-10">
-                        <div className="px-3 py-1.5 bg-brand-primary text-white text-[10px] font-black rounded-lg shadow-lg">
-                          {paperSize.toUpperCase()} SHEET
+                            <input 
+                              type="range" min="50" max="150" value={brightness} 
+                              onChange={(e) => dispatch(setAdjustment({ type: 'brightness', value: Number(e.target.value) }))} 
+                              className="w-full" 
+                            />
                         </div>
-                      </div>
-                   </Card>
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center px-0.5">
+                              <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Tone Contrast</span>
+                              <span className="text-[11px] font-bold text-indigo-400/80">{contrast}%</span>
+                            </div>
+                            <input 
+                              type="range" min="50" max="150" value={contrast} 
+                              onChange={(e) => dispatch(setAdjustment({ type: 'contrast', value: Number(e.target.value) }))} 
+                              className="w-full" 
+                            />
+                        </div>
 
-                   <Card className="p-5 space-y-6 bg-white dark:bg-slate-900 border-none shadow-xl">
-                      <div className="space-y-4">
-                        <div className="grid grid-cols-4 gap-2">
-                           {['A4', 'A5', 'A6', 'single'].map(size => (
-                             <button 
-                               key={size} 
-                               onClick={() => dispatch(setPaperSize(size as any))} 
-                               className={`py-2 rounded-xl border text-[10px] font-black transition-all 
-                               ${paperSize === size ? 'bg-slate-900 text-white border-slate-900' : 'border-slate-100 hover:border-slate-300 text-slate-500'}`}
-                             >
-                               {size.toUpperCase()}
-                             </button>
-                           ))}
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-4 pt-2">
-                          <div className="space-y-2">
-                             <div className="flex justify-between items-center">
-                               <span className="text-[10px] font-black text-slate-400 uppercase">Copies</span>
-                               <span className="text-[10px] font-black text-slate-900 dark:text-white px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded">{copies}</span>
+                        <div className="pt-2">
+                           <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 block mb-3.5">Chroma Background</span>
+                           <div className="flex flex-wrap gap-2.5">
+                             {presets.map(p => (
+                               <button 
+                                 key={p.color} 
+                                 onClick={() => dispatch(setBgColor(p.color))} 
+                                 className={`w-9 h-9 rounded-xl border-2 transition-all relative group
+                                   ${bgColor === p.color ? 'border-indigo-500 scale-105 shadow-lg shadow-indigo-500/20' : 'border-slate-800 hover:border-slate-600'}`} 
+                                 style={{ backgroundColor: p.color }}
+                               >
+                                 {bgColor === p.color && <div className="absolute inset-0 flex items-center justify-center"><Check className={`w-3.5 h-3.5 ${p.color === '#ffffff' ? 'text-black' : 'text-white'}`} strokeWidth={3} /></div>}
+                               </button>
+                             ))}
+                             <div className="w-9 h-9 rounded-xl border-2 border-slate-800 bg-slate-900 flex items-center justify-center relative hover:border-slate-600 overflow-hidden">
+                               <input type="color" value={bgColor} onChange={(e) => dispatch(setBgColor(e.target.value))} className="absolute inset-0 opacity-0 cursor-pointer" />
+                               <div className="w-4 h-4 rounded-full bg-gradient-to-tr from-rose-400 via-indigo-500 to-emerald-400 border border-white/20"></div>
                              </div>
-                             <input 
-                               type="range" 
-                               min="1" 
-                               max="50" 
-                               value={copies} 
-                               onChange={(e) => dispatch(setCopies(Number(e.target.value)))} 
-                               className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg accent-brand-primary" 
-                             />
-                          </div>
-                          <div className="space-y-2">
-                             <div className="flex justify-between items-center">
-                               <span className="text-[10px] font-black text-slate-400 uppercase">Gap (mm)</span>
-                               <span className="text-[10px] font-black text-slate-900 dark:text-white px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded">{spacing}</span>
-                             </div>
-                             <input 
-                               type="range" 
-                               min="0" 
-                               max="10" 
-                               value={spacing} 
-                               onChange={(e) => dispatch(setSpacing(Number(e.target.value)))} 
-                               className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg accent-brand-primary" 
-                             />
-                          </div>
+                           </div>
                         </div>
-                      </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-4 border-t border-slate-50 dark:border-slate-800">
                         <Button 
-                          size="lg" 
-                          className="w-full font-black text-sm h-14" 
-                          onClick={handlePrint} 
-                          disabled={isPrinting || !finalPhoto} 
-                          leftIcon={<Printer className="w-5 h-5" />}
+                          variant="outline"
+                          onClick={handleRemoveBG} 
+                          isLoading={isRemovingBG}
+                          className="w-full h-11 text-[11px] font-bold uppercase tracking-widest border-slate-800 rounded-2xl hover:bg-slate-800/40" 
+                          leftIcon={<Sparkles className="w-4 h-4 text-indigo-400" />}
                         >
-                          PRINT NOW
-                        </Button>
-                        <Button 
-                          size="lg" 
-                          variant="secondary"
-                          className="w-full font-black text-sm h-14 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white hover:bg-slate-200" 
-                          onClick={downloadPDF} 
-                          disabled={isGenerating || !finalPhoto} 
-                          leftIcon={<Download className="w-5 h-5" />}
-                        >
-                          EXPORT PDF
+                          Extract Subject (AI)
                         </Button>
                       </div>
-                      
-                      {!finalPhoto && (
-                        <div className="flex items-center gap-2 p-3 bg-brand-primary/5 rounded-xl border border-brand-primary/20">
-                           <Info className="w-4 h-4 text-brand-primary" />
-                           <p className="text-[10px] font-bold text-brand-primary uppercase">Click "Generate Studio Photo" to enable print/export</p>
-                        </div>
-                      )}
-                   </Card>
-                   
-                   <Card className="p-4 bg-slate-50 dark:bg-slate-800/30 border-none">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center">
-                          <Check className="w-5 h-5 text-green-500" />
-                        </div>
-                        <div>
-                          <h4 className="text-[11px] font-black text-slate-800 dark:text-white uppercase tracking-tight">Requirement Validated</h4>
-                          <p className="text-[10px] text-slate-500 font-medium">Output: {calcPix.w}x{calcPix.h} pixels @ {dpi}dpi</p>
+                   </div>
+
+                   <Button 
+                     onClick={handleApplyCrop} 
+                     className="w-full h-14 bg-indigo-500 hover:bg-indigo-600 text-[11px] font-bold uppercase tracking-[0.2em] rounded-2xl shadow-2xl shadow-indigo-500/20 active:scale-[0.98] transition-all" 
+                     leftIcon={<Save className="w-5 h-5 mr-1" />}
+                   >
+                     Process Artifact
+                   </Button>
+                </Card>
+
+                {/* Real-time Proofing Panel */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between px-1">
+                    <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-widest">Master Proof</span>
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-900/50 rounded-full border border-slate-800">
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+                      <span className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">Live Validated</span>
+                    </div>
+                  </div>
+
+                  <Card className="p-10 bg-[#0A0A0B] border border-white/5 shadow-2xl relative overflow-hidden flex items-center justify-center rounded-3xl min-h-[360px]">
+                    <motion.div initial={false} animate={{ scale: finalPhoto ? 1 : 0.96 }} className="relative z-10">
+                      <div className="bg-white shadow-[0_20px_80px_rgba(0,0,0,0.6)] rounded-[1px] overflow-hidden transition-all duration-700" style={{ width: pagePx.w, height: pagePx.h }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: `${spacing * previewScale}mm` }}>
+                          {Array.from({ length: copies }).map((_, i) => (
+                            <div key={i} style={{ 
+                              width: `${photoRatio.width * 10 * previewScale}mm`, 
+                              height: `${photoRatio.height * 10 * previewScale}mm`, 
+                              backgroundColor: bgColor,
+                              boxShadow: 'inset 0 0 0 0.5px rgba(0,0,0,0.05)'
+                            }}>
+                              {finalPhoto ? <img src={finalPhoto} alt="Proof" className="w-full h-full object-cover" /> : <div className="w-full h-full border border-slate-50 opacity-10"></div>}
+                            </div>
+                          ))}
                         </div>
                       </div>
-                   </Card>
+                    </motion.div>
+                    {!finalPhoto && (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] z-20">
+                         <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.3em] animate-pulse">
+                            Awaiting Manifest
+                         </p>
+                      </div>
+                    )}
+                  </Card>
+
+                  <Card className="p-6 saas-card border-none rounded-3xl space-y-6 shadow-2xl">
+                    <div className="space-y-5">
+                      <div className="p-1.5 bg-slate-950/50 rounded-xl border border-slate-800/50 flex gap-1">
+                        {['A4', 'A5', 'A6', 'single'].map(sz => (
+                          <button 
+                            key={sz} onClick={() => dispatch(setPaperSize(sz as any))} 
+                            className={`flex-1 py-2 rounded-lg text-[10px] font-bold uppercase transition-all 
+                            ${paperSize === sz ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/10' : 'text-slate-600 hover:text-slate-400'}`}
+                          >
+                            {sz}
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="space-y-5 px-1 pt-1">
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-center"><span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Multi-Copy</span><span className="text-sm font-bold text-indigo-400">{copies}x</span></div>
+                          <input type="range" min="1" max="50" value={copies} onChange={(e) => dispatch(setCopies(Number(e.target.value)))} className="w-full" />
+                        </div>
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-center"><span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Offset Gap</span><span className="text-sm font-bold text-indigo-400">{spacing}mm</span></div>
+                          <input type="range" min="0" max="10" value={spacing} onChange={(e) => dispatch(setSpacing(Number(e.target.value)))} className="w-full" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 pt-6 border-t border-slate-800">
+                      <Button onClick={handlePrint} disabled={!finalPhoto} className="h-12 bg-white text-black hover:bg-slate-200 rounded-2xl text-[11px] font-bold uppercase tracking-wider" leftIcon={<Printer className="w-4 h-4" />}>Print</Button>
+                      <Button variant="ghost" onClick={downloadPDF} disabled={!finalPhoto} className="h-12 text-slate-400 hover:text-white rounded-2xl text-[11px] font-bold uppercase tracking-wider border border-slate-800" leftIcon={<Download className="w-4 h-4" />}>PDF</Button>
+                    </div>
+                  </Card>
                 </div>
               </motion.div>
             )}

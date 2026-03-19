@@ -15,6 +15,7 @@ interface PassportState {
   showFaceGuide: boolean;
   photoRatio: { width: number; height: number };
   dpi: number;
+  selectedPreset: string | null;
 }
 
 const initialState: PassportState = {
@@ -32,6 +33,7 @@ const initialState: PassportState = {
   showFaceGuide: true,
   photoRatio: { width: 5.1, height: 5.1 }, // 5.1cm x 5.1cm (51mm x 51mm)
   dpi: 300,
+  selectedPreset: 'India (Visa)',
 };
 
 const passportSlice = createSlice({
@@ -65,8 +67,10 @@ const passportSlice = createSlice({
     setBgColor: (state, action: PayloadAction<string>) => {
       state.bgColor = action.payload;
     },
-    setPhotoRatio: (state, action: PayloadAction<{ width: number; height: number }>) => {
-      state.photoRatio = action.payload;
+    setPhotoRatio: (state, action: PayloadAction<{ width: number; height: number; presetName?: string }>) => {
+      state.photoRatio.width = action.payload.width;
+      state.photoRatio.height = action.payload.height;
+      state.selectedPreset = action.payload.presetName || null;
     },
     toggleFaceGuide: (state) => {
       state.showFaceGuide = !state.showFaceGuide;
