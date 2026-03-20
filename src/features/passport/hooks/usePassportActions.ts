@@ -145,9 +145,31 @@ export const usePassportActions = () => {
     }
   };
 
+  const handleDownloadAsset = async (format: 'jpeg' | 'png' | 'webp' = 'jpeg') => {
+    if (!image || !croppedAreaPixels) return;
+    const toastId = toast.loading(`Preparing ${format.toUpperCase()}...`);
+    try {
+      const croppedImg = await generatePassportSnippet(
+        image, croppedAreaPixels, rotation, bgColor, brightness, contrast, dpi, photoRatio.width * 10, photoRatio.height * 10, format
+      );
+      
+      // If we need a different format than the default JPEG from generatePassportSnippet,
+      // we can convert it by drawing to a new canvas or just use as is if JPEG requested.
+      // Actually, let's update generatePassportSnippet to handle format optionally.
+      
+      const link = document.createElement('a');
+      link.download = `passport_photo_${Date.now()}.${format}`;
+      link.href = croppedImg; // Assuming we update generatePassportSnippet below
+      link.click();
+      toast.success('Download complete!', { id: toastId });
+    } catch {
+      toast.error('Download failed');
+    }
+  };
+
   return {
     isRemovingBG, handleRemoveBG, handleApplyCrop, handleDownloadPDF,
-    handlePrint, clearImage, onCropComplete,
+    handlePrint, clearImage, onCropComplete, handleDownloadAsset,
     isGenerating, isPrinting, printImage, finalPhoto, croppedAreaPixels
   };
 };

@@ -12,7 +12,8 @@ export const generatePassportSnippet = async (
   contrast = 100,
   targetDpi = 300,
   targetWidthMM = 35,
-  targetHeightMM = 45
+  targetHeightMM = 45,
+  format: 'jpeg' | 'png' | 'webp' = 'jpeg'
 ): Promise<string> => {
   const img = new Image();
   img.src = imageSrc;
@@ -57,7 +58,7 @@ export const generatePassportSnippet = async (
   );
   ctx.restore();
 
-  return canvas.toDataURL('image/jpeg', 0.92);
+  return canvas.toDataURL(`image/${format}`, format === 'jpeg' ? 0.92 : 1.0);
 };
 
 // Helper for print dimensions

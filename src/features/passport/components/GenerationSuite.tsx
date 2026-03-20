@@ -8,10 +8,11 @@ interface GenerationSuiteProps {
   previewScale: number;
   onPrint: () => void;
   onDownloadPDF: () => void;
+  onDownloadAsset: (format: 'jpeg' | 'png' | 'webp') => void;
 }
 
 export const GenerationSuite: React.FC<GenerationSuiteProps> = ({
-  finalPhoto, pagePx, previewScale, onPrint, onDownloadPDF
+  finalPhoto, pagePx, previewScale, onPrint, onDownloadPDF, onDownloadAsset
 }) => {
   return (
     <section id="generation-suite" className={`space-y-8 transition-all duration-700 ${!finalPhoto ? 'opacity-20 pointer-events-none grayscale' : ''}`}>
@@ -27,7 +28,7 @@ export const GenerationSuite: React.FC<GenerationSuiteProps> = ({
         </div>
 
         <div className="xl:col-span-4">
-          <PrintSettings onPrint={onPrint} onDownloadPDF={onDownloadPDF} finalPhoto={finalPhoto} />
+          <PrintSettings onPrint={onPrint} onDownloadPDF={onDownloadPDF} onDownloadAsset={onDownloadAsset} finalPhoto={finalPhoto} />
         </div>
       </div>
     </section>

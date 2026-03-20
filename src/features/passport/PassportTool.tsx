@@ -20,7 +20,7 @@ export const PassportTool = () => {
 
   const {
     isRemovingBG, handleRemoveBG, handleApplyCrop, handleDownloadPDF,
-    handlePrint, clearImage, onCropComplete,
+    handlePrint, clearImage, onCropComplete, handleDownloadAsset,
     isPrinting, printImage, finalPhoto
   } = usePassportActions();
 
@@ -61,6 +61,7 @@ export const PassportTool = () => {
                 previewScale={previewScale} 
                 onPrint={handlePrint} 
                 onDownloadPDF={handleDownloadPDF} 
+                onDownloadAsset={handleDownloadAsset}
               />
             </div>
           )}

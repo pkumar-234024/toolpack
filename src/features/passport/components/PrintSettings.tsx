@@ -4,16 +4,17 @@ import type { RootState } from '../../../app/store';
 import { setPaperSize, setCopies, setSpacing } from '../passportSlice';
 import { Button } from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
-import { Printer, Download } from 'lucide-react';
+import { Printer, Download, ImageDown } from 'lucide-react';
 
 interface PrintSettingsProps {
   onPrint: () => void;
   onDownloadPDF: () => void;
+  onDownloadAsset: (format: 'jpeg' | 'png' | 'webp') => void;
   finalPhoto: string | null;
 }
 
 export const PrintSettings: React.FC<PrintSettingsProps> = ({ 
-  onPrint, onDownloadPDF, finalPhoto 
+  onPrint, onDownloadPDF, onDownloadAsset, finalPhoto 
 }) => {
   const dispatch = useDispatch();
   const { paperSize, copies, spacing } = useSelector((state: RootState) => state.passport);
@@ -23,6 +24,31 @@ export const PrintSettings: React.FC<PrintSettingsProps> = ({
   return (
     <Card className="p-8 saas-card space-y-8 rounded-3xl">
        <div className="space-y-6">
+          <div className="space-y-4">
+             <span className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] flex items-center gap-2 mb-2">
+               <ImageDown className="w-3.5 h-3.5" /> Export Individual Asset
+             </span>
+             <div className="flex gap-2">
+                {[
+                  { label: 'JPG', format: 'jpeg' },
+                  { label: 'PNG', format: 'png' },
+                  { label: 'WebP', format: 'webp' }
+                ].map(f => (
+                  <Button 
+                    key={f.format} 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => onDownloadAsset(f.format as any)}
+                    className="flex-1 bg-slate-900/50 hover:bg-slate-800 border border-white/5 text-[10px] h-10 font-bold"
+                  >
+                    {f.label}
+                  </Button>
+                ))}
+             </div>
+          </div>
+
+          <div className="h-px bg-slate-800/40"></div>
+          
          <div className="p-1 bg-slate-950/80 rounded-xl flex gap-1 border border-white/5">
             {['A4', 'A5', 'A6', 'single'].map(sz => (
               <button 
