@@ -17,7 +17,7 @@ export const PresetGrid: React.FC = () => {
 
   return (
     <div className="space-y-8">
-       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-2 gap-4">
           {countries.map(c => (
             <button 
               key={c.name} onClick={() => dispatch(setPhotoRatio({ width: c.width, height: c.height, presetName: c.name }))}
