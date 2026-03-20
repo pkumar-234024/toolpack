@@ -10,10 +10,11 @@ interface ProcessingSuiteProps {
   onRemoveBG: () => void;
   onApplyCrop: () => void;
   isRemovingBG: boolean;
+  onDownloadAsset: (format: 'jpeg' | 'png' | 'webp') => void;
 }
 
 export const ProcessingSuite: React.FC<ProcessingSuiteProps> = ({
-  onCropComplete, clearImage, onRemoveBG, onApplyCrop, isRemovingBG
+  onCropComplete, clearImage, onRemoveBG, onApplyCrop, isRemovingBG, onDownloadAsset
 }) => {
   return (
     <section className="space-y-3">
@@ -31,7 +32,7 @@ export const ProcessingSuite: React.FC<ProcessingSuiteProps> = ({
           <CalibrationDashboard onRemoveBG={onRemoveBG} onApplyCrop={onApplyCrop} isRemovingBG={isRemovingBG} />
         </div>
         <div className="xl:col-span-6">
-          <PresetGrid />
+          <PresetGrid onDownloadAsset={onDownloadAsset} />
         </div>
       </div>
     </section>

@@ -53,6 +53,7 @@ export const PassportTool = () => {
                 onRemoveBG={handleRemoveBG} 
                 onApplyCrop={handleApplyCrop} 
                 isRemovingBG={isRemovingBG} 
+                onDownloadAsset={handleDownloadAsset}
               />
 
               <GenerationSuite 
