@@ -1,4 +1,3 @@
-import React from 'react';
 import { Camera, PenTool, Scaling, FileType2, Search, Filter } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';

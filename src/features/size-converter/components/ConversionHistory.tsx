@@ -1,10 +1,10 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '../../../app/store';
-import { clearHistory } from '../sizeSlice';
+import { clearHistory, removeHistoryItem } from '../sizeSlice';
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
-import { History, X, Trash2, Clock } from 'lucide-react';
+import { History, Trash2, Clock, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const ConversionHistory: React.FC = () => {
@@ -37,25 +37,30 @@ export const ConversionHistory: React.FC = () => {
               key={item.id}
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95 }}
+              exit={{ opacity: 0, scale: 0.95, x: -20 }}
             >
-              <Card className="p-8 border-none saas-card-flat bg-white dark:bg-slate-950 shadow-2xl group hover:shadow-indigo-500/5 transition-all">
+              <Card className="p-8 border-none saas-card-flat bg-white dark:bg-slate-950 shadow-2xl group hover:shadow-indigo-500/5 transition-all overflow-hidden relative">
                 <div className="flex justify-between items-start mb-6">
                   <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex items-center justify-center text-slate-400 group-hover:text-indigo-500 transition-colors">
                      <Clock className="w-5 h-5" />
                   </div>
-                  <span className="text-[10px] font-black text-slate-300 dark:text-slate-800">#{item.id.slice(0, 4)}</span>
+                  <button 
+                    onClick={() => dispatch(removeHistoryItem(item.id))}
+                    className="p-2 text-slate-200 hover:text-rose-500 transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
 
-                <div className="flex items-center gap-6">
+                <div className="flex items-center gap-4">
                   <div className="flex flex-col">
-                    <span className="text-[10px] font-black uppercase text-slate-400 mb-1">{item.fromUnit}</span>
-                    <span className="text-2xl font-black text-slate-800 dark:text-slate-200 tabular-nums">{item.fromValue}</span>
+                    <span className="text-[9px] font-black uppercase text-slate-400 mb-1">{item.fromUnit}</span>
+                    <span className="text-xl font-black text-slate-800 dark:text-slate-200 tabular-nums">{item.fromValue}</span>
                   </div>
-                  <X className="w-4 h-4 text-slate-200 dark:text-slate-800" />
+                  <ArrowRight className="w-4 h-4 text-slate-200 dark:text-slate-800" />
                   <div className="flex flex-col">
-                    <span className="text-[10px] font-black uppercase text-indigo-500 mb-1">{item.toUnit}</span>
-                    <span className="text-2xl font-black text-indigo-500 tabular-nums">{item.toValue}</span>
+                    <span className="text-[9px] font-black uppercase text-indigo-500 mb-1">{item.toUnit}</span>
+                    <span className="text-xl font-black text-indigo-500 tabular-nums">{item.toValue}</span>
                   </div>
                 </div>
               </Card>

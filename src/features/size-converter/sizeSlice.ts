@@ -47,8 +47,11 @@ const sizeSlice = createSlice({
     clearHistory: (state) => {
       state.history = [];
     },
+    removeHistoryItem: (state, action: PayloadAction<string>) => {
+      state.history = state.history.filter(item => item.id !== action.payload);
+    },
   },
 });
 
-export const { setFromValue, setFromUnit, setToUnit, setDpi, addHistory, clearHistory } = sizeSlice.actions;
+export const { setFromValue, setFromUnit, setToUnit, setDpi, addHistory, clearHistory, removeHistoryItem } = sizeSlice.actions;
 export default sizeSlice.reducer;
