@@ -55,8 +55,8 @@ export const CalibrationDashboard: React.FC<CalibrationDashboardProps> = ({
           </div>
        </div>
        <div className="pt-6 border-t border-slate-800/50 space-y-4">
-          <Button variant="outline" className="w-full h-12 border-slate-800 text-[11px] font-bold uppercase tracking-widest" onClick={onRemoveBG} isLoading={isRemovingBG} leftIcon={<Sparkles className="w-4 h-4" />}>AI Background Clean</Button>
-          <Button className="w-full h-16 bg-indigo-500 hover:bg-indigo-600 font-bold uppercase tracking-[0.2em] shadow-2xl shadow-indigo-500/20" onClick={onApplyCrop} leftIcon={<Check className="w-5 h-5" />}>Process Assets</Button>
+          <Button variant="outline" className="w-full h-12 border-slate-800 text-[11px] font-bold uppercase tracking-widest" onClick={onRemoveBG} isLoading={isRemovingBG} leftIcon={<Sparkles className="w-4 h-4" />}>AI Background Remove</Button>
+          <Button className="w-full h-16 bg-indigo-500 hover:bg-indigo-600 font-bold uppercase tracking-[0.2em] shadow-2xl shadow-indigo-500/20" onClick={onApplyCrop} leftIcon={<Check className="w-5 h-5" />}>Process Asset</Button>
        </div>
     </Card>
   );

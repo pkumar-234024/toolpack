@@ -14,7 +14,7 @@ export const GenerationSuite: React.FC<GenerationSuiteProps> = ({
   finalPhoto, pagePx, previewScale, onPrint, onDownloadPDF
 }) => {
   return (
-    <section className={`space-y-8 transition-all duration-700 ${!finalPhoto ? 'opacity-20 pointer-events-none grayscale' : ''}`}>
+    <section id="generation-suite" className={`space-y-8 transition-all duration-700 ${!finalPhoto ? 'opacity-20 pointer-events-none grayscale' : ''}`}>
       <div className="flex items-center gap-3 px-1">
         <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-400">02</div>
         <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Layout & Generation Suite</h2>

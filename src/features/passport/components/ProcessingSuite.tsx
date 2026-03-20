@@ -25,7 +25,7 @@ export const ProcessingSuite: React.FC<ProcessingSuiteProps> = ({
 
       <div className="grid grid-cols-1 xl:grid-cols-16 gap-8 items-start">
         <div className="xl:col-span-6">
-          <EditorWorkspace onCropComplete={onCropComplete} clearImage={clearImage} />
+          <EditorWorkspace onCropComplete={onCropComplete} clearImage={clearImage} isRemovingBG={isRemovingBG} />
         </div>
         <div className="xl:col-span-4 self-center">
           <CalibrationDashboard onRemoveBG={onRemoveBG} onApplyCrop={onApplyCrop} isRemovingBG={isRemovingBG} />

@@ -69,6 +69,14 @@ export const usePassportActions = () => {
       );
       setFinalPhoto(croppedImg);
       toast.success('Requirements applied!', { id: toastId });
+      
+      // Auto-scroll to next step for preview/print
+      setTimeout(() => {
+        const nextStep = document.getElementById('generation-suite');
+        if (nextStep) {
+          nextStep.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 400);
     } catch { 
       toast.error('Failed to apply edits'); 
     }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { Area } from 'react-easy-crop';
 import Cropper from 'react-easy-crop';
 import { useDispatch, useSelector } from 'react-redux';
@@ -6,14 +7,15 @@ import type { RootState } from '../../../app/store';
 import { setCrop, setZoom, setRotation, toggleFaceGuide } from '../passportSlice';
 import { Button } from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
-import { Eye, EyeOff, RotateCcw, Minus, Plus, RotateCw } from 'lucide-react';
+import { Eye, EyeOff, RotateCcw, Minus, Plus, RotateCw, Loader2 } from 'lucide-react';
 
 interface EditorWorkspaceProps {
   onCropComplete: (croppedArea: Area, croppedAreaPixels: Area) => void;
   clearImage: () => void;
+  isRemovingBG?: boolean;
 }
 
-export const EditorWorkspace: React.FC<EditorWorkspaceProps> = ({ onCropComplete, clearImage }) => {
+export const EditorWorkspace: React.FC<EditorWorkspaceProps> = ({ onCropComplete, clearImage, isRemovingBG }) => {
   const dispatch = useDispatch();
   const { 
     image, crop, zoom, rotation, photoRatio, bgColor, brightness, contrast, showFaceGuide 
@@ -48,19 +50,51 @@ export const EditorWorkspace: React.FC<EditorWorkspaceProps> = ({ onCropComplete
               </svg>
             </div>
           )}
-        </div>
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 p-2 bg-black/60 backdrop-blur-2xl rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 border border-white/10 shadow-2xl">
-          <button onClick={() => dispatch(setRotation(rotation - 90))} className="p-3 text-white/50 hover:text-white transition-colors hover:bg-white/5 rounded-xl"><RotateCcw className="w-5 h-5" /></button>
-          <div className="w-px h-6 bg-white/10"></div>
-          <div className="flex items-center gap-2 px-2">
-             <button onClick={() => dispatch(setZoom(Math.max(1, zoom - 0.1)))} className="p-2 text-white/50 hover:text-white"><Minus className="w-4 h-4" /></button>
-             <div className="text-[14px] font-bold text-white w-12 text-center tabular-nums">{zoom.toFixed(1)}x</div>
-             <button onClick={() => dispatch(setZoom(Math.min(4, zoom + 0.1)))} className="p-2 text-white/50 hover:text-white"><Plus className="w-4 h-4" /></button>
-          </div>
-          <div className="w-px h-6 bg-white/10"></div>
-          <button onClick={() => dispatch(setRotation(rotation + 90))} className="p-3 text-white/50 hover:text-white transition-colors hover:bg-white/5 rounded-xl"><RotateCw className="w-5 h-5" /></button>
+
+          <AnimatePresence>
+            {isRemovingBG && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 z-50 bg-slate-950/40 backdrop-blur-md flex flex-col items-center justify-center gap-4"
+              >
+                 <div className="relative">
+                   <Loader2 className="w-12 h-12 text-indigo-400 animate-spin" />
+                   <div className="absolute inset-0 blur-2xl bg-indigo-500/20 animate-pulse rounded-full" />
+                 </div>
+                 <span className="text-[10px] font-black uppercase text-indigo-100 tracking-[0.2em] animate-pulse">Removing Background...</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </Card>
+
+      <div className="flex items-center justify-between px-8 py-4 bg-slate-900/40 dark:bg-black/20 border border-white/5 rounded-[2.5rem] backdrop-blur-3xl shadow-2xl">
+        <div className="flex flex-col">
+          <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Canvas Precision</span>
+          <span className="text-[10px] font-bold text-indigo-400/50 uppercase tracking-widest">Interactive Transformation</span>
+        </div>
+        
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3">
+             <button onClick={() => dispatch(setRotation(rotation - 90))} className="p-3 text-slate-400 hover:text-white transition-all bg-slate-800/40 hover:bg-slate-800/60 rounded-xl border border-white/5"><RotateCcw className="w-4 h-4" /></button>
+             <button onClick={() => dispatch(setRotation(rotation + 90))} className="p-3 text-slate-400 hover:text-white transition-all bg-slate-800/40 hover:bg-slate-800/60 rounded-xl border border-white/5"><RotateCw className="w-4 h-4" /></button>
+          </div>
+          
+          <div className="h-8 w-px bg-slate-800/50"></div>
+          
+          <div className="flex items-center gap-3 bg-slate-800/40 rounded-2xl p-1.5 px-4 border border-white/5">
+             <button onClick={() => dispatch(setZoom(Math.max(1, zoom - 0.1)))} className="p-2 text-slate-400 hover:text-white transition-colors group">
+               <Minus className="w-4 h-4 group-hover:scale-110 active:scale-90 transition-transform" />
+             </button>
+             <div className="text-[14px] font-black text-white w-14 text-center tabular-nums bg-slate-950/50 py-1.5 rounded-lg border border-white/5">{zoom.toFixed(1)}x</div>
+             <button onClick={() => dispatch(setZoom(Math.min(4, zoom + 0.1)))} className="p-2 text-slate-400 hover:text-white transition-colors group">
+               <Plus className="w-4 h-4 group-hover:scale-110 active:scale-90 transition-transform" />
+             </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
