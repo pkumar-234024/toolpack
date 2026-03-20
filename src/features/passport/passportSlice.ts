@@ -27,11 +27,11 @@ const initialState: PassportState = {
   contrast: 100,
   paperSize: 'A4',
   margin: 10,
-  spacing: 5,
-  copies: 8,
+  spacing: 1,
+  copies: 6,
   bgColor: '#ffffff',
   showFaceGuide: true,
-  photoRatio: { width: 5.1, height: 5.1 }, // 5.1cm x 5.1cm (51mm x 51mm)
+  photoRatio: { width: 3.4, height: 4.7 }, // 34mm x 47mm
   dpi: 300,
   selectedPreset: 'India (Visa)',
 };

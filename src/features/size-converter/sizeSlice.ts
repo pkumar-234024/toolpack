@@ -1,40 +1,54 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
+interface HistoryItem {
+  id: string;
+  fromValue: string;
+  fromUnit: string;
+  toValue: string;
+  toUnit: string;
+  timestamp: number;
+}
+
 interface SizeState {
-  fromUnit: 'px' | 'cm' | 'inch';
-  toUnit: 'px' | 'cm' | 'inch';
-  value: number;
-  width: number;
-  height: number;
+  fromValue: string;
+  fromUnit: 'px' | 'cm' | 'inch' | 'mm';
+  toUnit: 'px' | 'cm' | 'inch' | 'mm';
   dpi: number;
+  history: HistoryItem[];
 }
 
 const initialState: SizeState = {
-  fromUnit: 'px',
+  fromValue: '51',
+  fromUnit: 'mm',
   toUnit: 'cm',
-  value: 0,
-  width: 0,
-  height: 0,
-  dpi: 96, // default screen DPI
+  dpi: 300,
+  history: [],
 };
 
 const sizeSlice = createSlice({
   name: 'size',
   initialState,
   reducers: {
-    setDimensions: (state, action: PayloadAction<{ width: number; height: number }>) => {
-      state.width = action.payload.width;
-      state.height = action.payload.height;
+    setFromValue: (state, action: PayloadAction<string>) => {
+      state.fromValue = action.payload;
     },
-    setUnits: (state, action: PayloadAction<{ from: SizeState['fromUnit']; to: SizeState['toUnit'] }>) => {
-      state.fromUnit = action.payload.from;
-      state.toUnit = action.payload.to;
+    setFromUnit: (state, action: PayloadAction<SizeState['fromUnit']>) => {
+      state.fromUnit = action.payload;
+    },
+    setToUnit: (state, action: PayloadAction<SizeState['toUnit']>) => {
+      state.toUnit = action.payload;
     },
     setDpi: (state, action: PayloadAction<number>) => {
       state.dpi = action.payload;
     },
+    addHistory: (state, action: PayloadAction<HistoryItem>) => {
+      state.history = [action.payload, ...state.history].slice(0, 10);
+    },
+    clearHistory: (state) => {
+      state.history = [];
+    },
   },
 });
 
-export const { setDimensions, setUnits, setDpi } = sizeSlice.actions;
+export const { setFromValue, setFromUnit, setToUnit, setDpi, addHistory, clearHistory } = sizeSlice.actions;
 export default sizeSlice.reducer;
