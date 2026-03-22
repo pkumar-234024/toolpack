@@ -7,6 +7,9 @@ import { Home } from './pages/Home';
 import { Tools } from './pages/Tools';
 import { About } from './pages/About';
 import { Loader2 } from 'lucide-react';
+import { Privacy } from './pages/Privacy';
+import { Contact } from './pages/Contact';
+import { Feedback } from './pages/Feedback';
 
 const PassportTool = lazy(() => import('./features/passport/PassportTool').then(m => ({ default: m.PassportTool })));
 const SignatureTool = lazy(() => import('./features/signature/SignatureTool').then(m => ({ default: m.SignatureTool })));
@@ -41,6 +44,10 @@ function App() {
               <Route path="/tools/signature" element={<SignatureTool />} />
               <Route path="/tools/size-converter" element={<SizeConverter />} />
               <Route path="/tools/doc-converter" element={<DocConverter />} />
+              
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/feedback" element={<Feedback />} />
               
               {/* Catch all redirect to Home */}
               <Route path="*" element={<Navigate to="/" replace />} />

@@ -4,7 +4,7 @@ import type { RootState } from '../../../app/store';
 import { setPhotoRatio, setDPI} from '../passportSlice';
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
-import { Download, Monitor, Image, Ruler, ChevronDown, Maximize2 } from 'lucide-react';
+import { Download, Monitor, Image, Ruler, ChevronDown, MoveHorizontal, MoveVertical } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const countries = [
@@ -26,25 +26,45 @@ export const PresetGrid: React.FC<PresetGridProps> = ({ onDownloadAsset }) => {
 
   const handlePresetChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
-    if (val === 'custom') {
+    if (val === 'Custom') {
       setShowCustom(true);
-      dispatch(setPhotoRatio({ width: photoRatio.width, height: photoRatio.height, presetName: 'Custom' }));
+      dispatch(setPhotoRatio({ 
+        width: photoRatio.width, 
+        height: photoRatio.height, 
+        presetName: 'Custom' 
+      }));
     } else {
       setShowCustom(false);
       const preset = countries.find(c => c.name === val);
       if (preset) {
-        dispatch(setPhotoRatio({ width: preset.width, height: preset.height, presetName: preset.name }));
+        dispatch(setPhotoRatio({ 
+          width: preset.width, 
+          height: preset.height, 
+          presetName: preset.name 
+        }));
       }
     }
   };
 
   const updateCustomDimension = (dim: 'width' | 'height', val: string) => {
-    const num = parseFloat(val) || 0;
-    dispatch(setPhotoRatio({ 
-      ...photoRatio, 
-      [dim]: num,
-      presetName: 'Custom' 
-    }));
+    // Use an empty string check to allow clearing the input temporarily
+    if (val === '') {
+      dispatch(setPhotoRatio({ 
+        ...photoRatio, 
+        [dim]: 0,
+        presetName: 'Custom' 
+      }));
+      return;
+    }
+
+    const num = parseFloat(val);
+    if (!isNaN(num)) {
+      dispatch(setPhotoRatio({ 
+        ...photoRatio, 
+        [dim]: num,
+        presetName: 'Custom' 
+      }));
+    }
   };
 
   React.useEffect(() => {
@@ -73,14 +93,14 @@ export const PresetGrid: React.FC<PresetGridProps> = ({ onDownloadAsset }) => {
                 <label className="text-[9px] font-black uppercase text-slate-500 tracking-[0.2em] ml-1 mb-2 block">Specification Preset</label>
                 <div className="relative">
                   <select 
-                    value={selectedPreset || 'custom'} 
+                    value={selectedPreset === 'Custom' || !selectedPreset ? 'Custom' : selectedPreset} 
                     onChange={handlePresetChange}
                     className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-[13px] font-bold text-slate-200 focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all cursor-pointer hover:bg-black appearance-none"
                   >
                     {countries.map(c => (
                       <option key={c.name} value={c.name} className="bg-slate-900 border-none py-2">{c.name} ({c.label})</option>
                     ))}
-                    <option value="custom" className="bg-slate-900 border-none py-2 text-indigo-400 font-black">--- Custom Dimensions ---</option>
+                    <option value="Custom" className="bg-slate-900 border-none py-2 text-indigo-400 font-black">--- Custom Dimensions ---</option>
                   </select>
                   <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none group-hover:text-indigo-400 transition-colors" />
                 </div>
@@ -96,12 +116,12 @@ export const PresetGrid: React.FC<PresetGridProps> = ({ onDownloadAsset }) => {
                   >
                     <div className="space-y-2">
                       <label className="text-[9px] font-black uppercase text-slate-400/60 tracking-[0.2em] ml-1 flex items-center gap-2">
-                        <Maximize2 className="w-3 h-3" /> Width (cm)
+                        <MoveHorizontal className="w-3 h-3 text-indigo-400/70" /> Width (cm)
                       </label>
                       <input 
                         type="number" 
                         step="0.1"
-                        value={photoRatio.width}
+                        value={photoRatio.width || ''}
                         onChange={(e) => updateCustomDimension('width', e.target.value)}
                         className="w-full bg-slate-950/50 border border-white/5 rounded-xl px-4 py-3 text-sm font-bold text-white focus:border-indigo-500/50 focus:bg-slate-950 outline-none transition-all placeholder:text-slate-700"
                         placeholder="0.0"
@@ -109,12 +129,12 @@ export const PresetGrid: React.FC<PresetGridProps> = ({ onDownloadAsset }) => {
                     </div>
                     <div className="space-y-2">
                       <label className="text-[9px] font-black uppercase text-slate-400/60 tracking-[0.2em] ml-1 flex items-center gap-2">
-                        <Maximize2 className="w-3 h-3 rotate-90" /> Height (cm)
+                        <MoveVertical className="w-3 h-3 text-indigo-400/70" /> Height (cm)
                       </label>
                       <input 
                         type="number" 
                         step="0.1"
-                        value={photoRatio.height}
+                        value={photoRatio.height || ''}
                         onChange={(e) => updateCustomDimension('height', e.target.value)}
                         className="w-full bg-slate-950/50 border border-white/5 rounded-xl px-4 py-3 text-sm font-bold text-white focus:border-indigo-500/50 focus:bg-slate-950 outline-none transition-all placeholder:text-slate-700"
                         placeholder="0.0"

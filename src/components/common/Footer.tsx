@@ -1,4 +1,5 @@
 import { Mail, Github, Twitter, MapPin } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export const Footer = () => {
   return (
@@ -32,20 +33,20 @@ export const Footer = () => {
         <div>
           <h4 className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-white mb-6">Tools</h4>
           <ul className="space-y-4 text-slate-600 dark:text-slate-400">
-            <li><a href="#" className="hover:text-brand-primary transition-colors">Passport Photo Maker</a></li>
-            <li><a href="#" className="hover:text-brand-primary transition-colors">Signature Editor</a></li>
-            <li><a href="#" className="hover:text-brand-primary transition-colors">Size Converter</a></li>
-            <li><a href="#" className="hover:text-brand-primary transition-colors">Document Converter</a></li>
+            <li><Link to="/tools/passport" className="hover:text-brand-primary transition-colors">Passport Photo Maker</Link></li>
+            <li><Link to="/tools/signature" className="hover:text-brand-primary transition-colors">Signature Editor</Link></li>
+            <li><Link to="/tools/size-converter" className="hover:text-brand-primary transition-colors">Size Converter</Link></li>
+            <li><Link to="/tools/doc-converter" className="hover:text-brand-primary transition-colors">Document Converter</Link></li>
           </ul>
         </div>
 
         <div>
           <h4 className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-white mb-6">Company</h4>
           <ul className="space-y-4 text-slate-600 dark:text-slate-400">
-            <li><a href="#" className="hover:text-brand-primary transition-colors">About Us</a></li>
-            <li><a href="#" className="hover:text-brand-primary transition-colors">Privacy Policy</a></li>
-            <li><a href="#" className="hover:text-brand-primary transition-colors">Terms of Service</a></li>
-            <li><a href="#" className="hover:text-brand-primary transition-colors">Contact</a></li>
+            <li><Link to="/about" className="hover:text-brand-primary transition-colors">About Us</Link></li>
+            <li><Link to="/privacy" className="hover:text-brand-primary transition-colors">Privacy Policy</Link></li>
+            <li><Link to="/feedback" className="hover:text-brand-primary transition-colors">Feedback</Link></li>
+            <li><Link to="/contact" className="hover:text-brand-primary transition-colors">Contact</Link></li>
           </ul>
         </div>
 
