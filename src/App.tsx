@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './app/store';
 import { MainLayout } from './layouts/MainLayout';
+import { ScrollToTop } from './components/common/ScrollToTop';
 import { Home } from './pages/Home';
 import { Tools } from './pages/Tools';
 import { About } from './pages/About';
@@ -32,6 +33,7 @@ function App() {
   return (
     <Provider store={store}>
       <BrowserRouter>
+        <ScrollToTop />
         <MainLayout>
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
